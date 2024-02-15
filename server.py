@@ -17,7 +17,7 @@ s.listen(4)
 print("Waiting for a connection, Server Started")
 
 players = [Player(0,0,50,50, (255,0,0)), Player(100,100,50,50, (0,0,255)),
-           Player(200,200,50,50, (0,255,0))]
+           Player(200,200,50,50, (0,255,0)), Player(300, 100,50,50, (255,255,0))]
 
 def threaded_client(conn, client_id):
     global players
@@ -39,11 +39,13 @@ def threaded_client(conn, client_id):
                 #         if players[i] in reply:
                 #             reply.remove(players[i])
                 if client_id == 0:
-                    reply = [players[1], players[2]]
+                    reply = [players[1], players[2], players[3]]
                 elif client_id == 1:
-                    reply = [players[0], players[2]]
+                    reply = [players[0], players[2], players[3]]
                 elif client_id == 2:
-                    reply = [players[0], players[1]]
+                    reply = [players[0], players[1], players[3]]
+                elif client_id == 3:
+                    reply = [players[0], players[1], players[2]]
 
 
                 # print("Received: ", data)

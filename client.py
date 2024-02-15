@@ -29,9 +29,10 @@ while run:
 
     p.move()
     p.draw(screen)
-    for i in other_players:
-        if i.is_active:
-            i.draw(screen)
+    if other_players is not None:
+        for i in other_players:
+            if i.is_active:
+                i.draw(screen)
     pygame.display.flip()
 
 pygame.quit()
