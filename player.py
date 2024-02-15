@@ -4,6 +4,7 @@ class Player:
     def __init__(self, x, y, width, height, color, ID):
         self.x = x
         self.y = y
+        self.origin = (x, y)
         self.width = width
         self.height = height
         self.color = color

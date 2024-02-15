@@ -20,10 +20,10 @@ MAX_PLAYERS = 4
 players = [Player(0,0,50,50, (255,0,0), 1), Player(100,100,50,50, (0,0,255), 2),
            Player(200,200,50,50, (0,255,0), 3), Player(300,100,50,50, (255,255,0), 4)]
 
-closed_player_id = 0
+closed_player_id = None
 
 def threaded_client(conn, client_id):
-    global players, closed_player_id
+    global players, closed_player_id, currentPlayer
     conn.send(pickle.dumps(players[client_id]))
     reply = ""
     while True:
@@ -32,7 +32,7 @@ def threaded_client(conn, client_id):
             if type(data) == Player:
                 players[client_id] = data
             else:
-                closed_player_id = data-1
+                closed_player_id = data - 1
                 print(closed_player_id)
 
             if not data:
@@ -59,21 +59,23 @@ def threaded_client(conn, client_id):
             break
 
     print("Lost connection")
+    # currentPlayer -= 1
     conn.close()
 
 currentPlayer = 0
 while True:
     conn, addr = s.accept()
     print("Connected to:", addr)
-
-    if closed_player_id == 0:
+    if closed_player_id == None:
         start_new_thread(threaded_client, (conn, currentPlayer))
         currentPlayer += 1
     else:
         start_new_thread(threaded_client, (conn, closed_player_id))
-        closed_player_id = 0
+        print("Current one:" + str(closed_player_id))
 
-    if currentPlayer > MAX_PLAYERS:
+        closed_player_id = None
+
+    if currentPlayer >= MAX_PLAYERS:
         currentPlayer = MAX_PLAYERS
 
 

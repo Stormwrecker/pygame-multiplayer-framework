@@ -26,6 +26,7 @@ while run:
         if event.type == pygame.QUIT:
             run = False
             p.is_active = False
+            p.x, p.y = p.origin
             other_players = net.send(p)
             other_players = net.send(p.ID)
 
