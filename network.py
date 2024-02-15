@@ -9,8 +9,6 @@ class Network:
         self.port = 20
         self.addr = (self.server, self.port)
         self.p = self.connect()
-        self.num_of_players = 0
-        self.all_players = []
 
     def getP(self):
         return self.p

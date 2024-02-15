@@ -16,28 +16,30 @@ except socket.error as e:
 s.listen(4)
 print("Waiting for a connection, Server Started")
 
-players = [Player(0,0,50,50, (255,0,0)), Player(100,100,50,50, (0,0,255)),
-           Player(200,200,50,50, (0,255,0)), Player(300, 100,50,50, (255,255,0))]
+MAX_PLAYERS = 4
+players = [Player(0,0,50,50, (255,0,0), 1), Player(100,100,50,50, (0,0,255), 2),
+           Player(200,200,50,50, (0,255,0), 3), Player(300,100,50,50, (255,255,0), 4)]
+
+closed_player_id = 0
 
 def threaded_client(conn, client_id):
-    global players
+    global players, closed_player_id
     conn.send(pickle.dumps(players[client_id]))
     reply = ""
     while True:
         try:
             data = pickle.loads(conn.recv(2048))
-            players[client_id] = data
+            if type(data) == Player:
+                players[client_id] = data
+            else:
+                closed_player_id = data-1
+                print(closed_player_id)
 
             if not data:
                 print("Disconnected")
                 break
             else:
 
-                # for i in players:
-                #     if client_id == i:
-                #         reply = players
-                #         if players[i] in reply:
-                #             reply.remove(players[i])
                 if client_id == 0:
                     reply = [players[1], players[2], players[3]]
                 elif client_id == 1:
@@ -52,6 +54,7 @@ def threaded_client(conn, client_id):
                 # print("Sending: ", reply)
 
             conn.sendall(pickle.dumps(reply))
+
         except:
             break
 
@@ -63,5 +66,16 @@ while True:
     conn, addr = s.accept()
     print("Connected to:", addr)
 
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
+    if closed_player_id == 0:
+        start_new_thread(threaded_client, (conn, currentPlayer))
+        currentPlayer += 1
+    else:
+        start_new_thread(threaded_client, (conn, closed_player_id))
+        closed_player_id = 0
+
+    if currentPlayer > MAX_PLAYERS:
+        currentPlayer = MAX_PLAYERS
+
+
+    print("Current one:" + str(currentPlayer))
+

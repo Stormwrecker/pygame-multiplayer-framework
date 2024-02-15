@@ -19,6 +19,7 @@ run = True
 while run:
     clock.tick(60)
     screen.fill((255, 255, 255))
+
     other_players = net.send(p)
 
     for event in pygame.event.get():
@@ -26,6 +27,7 @@ while run:
             run = False
             p.is_active = False
             other_players = net.send(p)
+            other_players = net.send(p.ID)
 
     p.move()
     p.draw(screen)
