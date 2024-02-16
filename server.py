@@ -32,7 +32,7 @@ def threaded_client(conn, client_id):
 
     # send initial player to client
     conn.send(pickle.dumps(players[client_id]))
-    reply = ""
+    reply = []
 
     while True:
         try:
@@ -51,14 +51,10 @@ def threaded_client(conn, client_id):
                 break
             else:
                 # make a reply for the client
-                if client_id == 0:
-                    reply = [players[1], players[2], players[3]]
-                elif client_id == 1:
-                    reply = [players[0], players[2], players[3]]
-                elif client_id == 2:
-                    reply = [players[0], players[1], players[3]]
-                elif client_id == 3:
-                    reply = [players[0], players[1], players[2]]
+                reply = []
+                for player in players:
+                    if player != players[client_id] and player.is_active:
+                        reply.append(player)
 
             # send reply to client
             conn.sendall(pickle.dumps(reply))
