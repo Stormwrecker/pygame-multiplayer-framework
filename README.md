@@ -1,4 +1,4 @@
-This code is adapted from a series that TechWithTim made, but I made it expanable and can have up to 4 clients. It is fairly stable and has no known bugs, but there are probably a few things that may come up later on. Hopefully, it's generic enough to implement it in whatever Pygame project you have.
+This code is adapted from a series that TechWithTim made, but I made it expanable and can have up to 4 clients. So far, this framework has proved to be pretty indestructible. The only error you might get is if you try to open too many clients. Hopefully, it's generic enough to implement it in whatever Pygame project you have.
 
 Below is a preview of 4 clients interacting with each other:
 
