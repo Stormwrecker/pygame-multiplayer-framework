@@ -5,9 +5,10 @@ import pickle
 class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = "127.0.0.1"
+        self.server = "localhost"
         self.port = 20
         self.addr = (self.server, self.port)
+        self.data_size = 2048
         self.p = self.connect()
 
     def getP(self):
@@ -16,13 +17,13 @@ class Network:
     def connect(self):
         try:
             self.client.connect(self.addr)
-            return pickle.loads(self.client.recv(2048))
-        except:
-            pass
+            return pickle.loads(self.client.recv(self.data_size))
+        except socket.error as e:
+            print(e)
 
-    def send(self, data):
+    def trade(self, data):
         try:
             self.client.send(pickle.dumps(data))
-            return pickle.loads(self.client.recv(2048))
+            return pickle.loads(self.client.recv(self.data_size))
         except socket.error as e:
             print(e)

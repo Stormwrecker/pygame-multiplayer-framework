@@ -13,10 +13,16 @@ pygame.display.set_caption("Client")
 clock = pygame.time.Clock()
 
 # set up player and network
-net = Network()
-p = net.getP()
-player = Player(p["x"], p["y"], p["ID"])
-p["active"] = player.is_active
+server_working = False
+try:
+    net = Network()
+    p = net.getP()
+    player = Player(p["x"], p["y"], p["ID"])
+    p["active"] = player.is_active
+    server_working = True
+    pygame.display.set_caption(f"Player {p["ID"] + 1}")
+except:
+    player = Player(100, 100, 0)
 
 # our list that will contain other players
 other_players = {}
@@ -26,26 +32,27 @@ run = True
 while run:
     # make our clock run and screen white
     clock.tick(60)
-    screen.fill((255, 255, 255))
+    screen.fill((100, 100, 150))
 
     # get other players
     player_data = {"ID":player.ID, "x":player.rect.x, "y":player.rect.y, "active":player.is_active}
-    recv_player_data = net.send(player_data)
-    for key, value in recv_player_data.items():
-        if key != player.ID:
-            if key not in other_players:
-                if value["active"]:
-                    other_players[key] = Player(value["x"], value["y"], value["ID"])
-            else:
-                # update the values
-                if value["active"]:
-                    other_players[key].rect.x = value["x"]
-                    other_players[key].rect.y = value["y"]
+    if server_working:
+        recv_player_data = net.trade(player_data)
+        for key, value in recv_player_data.items():
+            if key != player.ID:
+                if key not in other_players:
+                    if value["active"]:
+                        other_players[key] = Player(value["x"], value["y"], value["ID"])
+                else:
+                    # update the values
+                    if value["active"]:
+                        other_players[key].rect.x = value["x"]
+                        other_players[key].rect.y = value["y"]
 
-    # Remove disconnected players from other_players
-    disconnected_players = [key for key in other_players.keys() if key not in recv_player_data]
-    for key in disconnected_players:
-        del other_players[key]
+        # Remove disconnected players from other_players
+        disconnected_players = [key for key in other_players.keys() if key not in recv_player_data]
+        for key in disconnected_players:
+            del other_players[key]
 
     # events
     for event in pygame.event.get():
@@ -55,9 +62,11 @@ while run:
             player_data = {"ID": player.ID, "x": player.x, "y": player.y,
                            "active": False}
             player.kill()
-            # send final info to server
-            recv_player_data = net.send(player_data)
-            recv_player_data = net.send(player_data["ID"])
+            if server_working:
+                # send final info to server
+                recv_player_data = net.trade(player_data)
+                recv_player_data = net.trade(player_data["ID"])
+                net.client.close()
 
     # draw and update other players
     for p in other_players.values():
