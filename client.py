@@ -12,17 +12,34 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Client")
 clock = pygame.time.Clock()
 
+# in case of server-setup failure
+def clean_up_fail(msg=None, net=None):
+    if msg is not None:
+        print("Failed to connect to server:", msg)
+    else:
+        print("Failed to connect to server")
+    player = Player(100, 100, 0)
+    server_working = False
+    if net is not None:
+        net.client.close()
+    return player, server_working
+
 # set up player and network
 server_working = False
 try:
     net = Network()
     p = net.getP()
-    player = Player(p["x"], p["y"], p["ID"])
-    p["active"] = player.is_active
-    server_working = True
-    pygame.display.set_caption(f"Player {p["ID"] + 1}")
+    if type(p) == dict:
+        player = Player(p["x"], p["y"], p["ID"])
+        p["active"] = player.is_active
+        fake_id = p["ID"] + 1
+        pygame.display.set_caption(f"Player {fake_id}")
+        print(f"Connected: You are Player {fake_id}")
+        server_working = True
+    else:
+        player, server_working = clean_up_fail(p, net)
 except:
-    player = Player(100, 100, 0)
+    player, server_working = clean_up_fail(p)
 
 # our list that will contain other players
 other_players = {}

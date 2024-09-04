@@ -19,7 +19,7 @@ class Network:
             self.client.connect(self.addr)
             return pickle.loads(self.client.recv(self.data_size))
         except socket.error as e:
-            print(e)
+            pass
 
     def trade(self, data):
         try:
@@ -27,3 +27,4 @@ class Network:
             return pickle.loads(self.client.recv(self.data_size))
         except socket.error as e:
             print(e)
+

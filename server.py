@@ -36,7 +36,10 @@ def threaded_client(conn, client_id):
     global start_player_data, closed_player_id, all_player_data
 
     # Send initial player data to the client
-    conn.send(pickle.dumps(start_player_data[client_id]))
+    if client_id < MAX_PLAYERS:
+        conn.send(pickle.dumps(start_player_data[client_id]))
+    else:
+        conn.send(pickle.dumps("Server is already full"))
 
     while True:
         try:
@@ -84,10 +87,6 @@ while True:
     conn, addr = s.accept()
     print("Connected to:", addr)
 
-    # so we don't get over MAX_PLAYER limit
-    if currentPlayer >= MAX_PLAYERS:
-        currentPlayer = MAX_PLAYERS
-
     # figure out what player to use next
     if len(closed_player_list) == 0:
         start_new_thread(threaded_client, (conn, currentPlayer))
@@ -98,7 +97,7 @@ while True:
 
     # so we don't get over MAX_PLAYER limit
     if currentPlayer >= MAX_PLAYERS:
-        currentPlayer = 0
+        currentPlayer = MAX_PLAYERS
 
     # print out which player
     print("Current one:" + str(currentPlayer))
